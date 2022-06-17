@@ -11,6 +11,12 @@ The program will lookup devices using either [shodan](https://www.shodan.io) or 
 Some of this information will be provided by either shodan or censys so it may not be 100% accurate.
 
 
+## How to setup search services:
+- censys: https://censys-python.readthedocs.io/en/stable/quick-start.html
+- shodan:
+  - create account (https://account.shodan.io/)
+  - copy API Key from account overview and place in config file
+
 ```shell
 git clone https://github.com/member87/cam-finder/
 cd cam-finder
