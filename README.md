@@ -12,6 +12,9 @@ Some of this information will be provided by either shodan or censys so it may n
 
 
 ```shell
+git clone https://github.com/member87/cam-finder/
+cd cam-finder
+
 # install requirements
 pip install -r requirements.txt
 
