@@ -121,7 +121,7 @@ if config.SHODAN:
 
 if config.CENSYS:
     h = CensysHosts()
-    query = h.search("NVR3.0", per_page=50, pages=5)
+    query = h.search("NVR3.0", per_page=100, pages=100)
 
     for page in query:
         for server in page:
