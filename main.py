@@ -99,13 +99,13 @@ def send_login_request(server, source, city, country, country_code, long, lat):
 
 
 
-def start_thread(param, source, city, country, country_code, long, lat):
+def start_thread(*args):
     while threads >= config.MAX_THREADS:
         pass
 
 
     change_thread_count(1)
-    threading.Thread(target=send_login_request, args=(param,source,city,country,country_code,long,lat)).start()
+    threading.Thread(target=send_login_request, args=(*args,)).start()
 
 print("\033[92msuccess\t\033[33mfailure\t\033[91merror")
 if config.SHODAN:
