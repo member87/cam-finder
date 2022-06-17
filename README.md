@@ -32,8 +32,6 @@ pip install -r requirements.txt
 # rename example config
 mv config-example.py config.py
 
-# configure shodan api key and / or censys api token
-
 # run program
 python main.py
 ```
