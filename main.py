@@ -106,6 +106,7 @@ def start_thread(param, source, city, country, country_code, long, lat):
     change_thread_count(1)
     threading.Thread(target=send_login_request, args=(param,source,city,country,country_code,long,lat)).start()
 
+print("\033[92msuccess\t\033[33mfailure\t\033[91merror")
 if config.SHODAN:
     api = Shodan(config.SHODAN_API)
     search_term = 'http.html:NVR3.0'
