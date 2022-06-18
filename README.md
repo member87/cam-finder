@@ -36,7 +36,7 @@ mv config-example.py config.py
 python main.py
 ```
 
-## Defualt credentials
+## Default credentials
 | Username      | Password |
 | -----------   | ----------- |
 | admin         | 123456       |
