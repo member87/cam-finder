@@ -59,7 +59,6 @@ def save(server, code, count, source, city, country, country_code, long, lat):
         f.writelines(f"{split[0]},{split[1]},{code},{count},{source},{city},{country},{country_code},{long},{lat}\n")
 
 def send_login_request(server, source, city, country, country_code, long, lat):
-    global success, failed, request_count
     try:
         r = requests.get(f"http://{server}/Media/UserGroup/login?response_format=json", headers={"Authorization": "Basic YWRtaW46MTIzNDU2" }, timeout=10)
         if r.status_code == 200:
