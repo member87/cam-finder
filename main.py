@@ -46,10 +46,10 @@ def change_value(value, change=1):
     return wrapper(value, change)
 
 @add_mutex("print_single")
-def print_single(server, status=False):
+def print_single(server, status=False, color="\033[91m"):
     if status:
         change_value("success")
-    print(f"[ \033[92m{counter['success']} \033[97m| \033[33m{counter['failed']} \033[97m| \033[91m{counter['errors']} \033[97m] http://\033[96m{server}\033[97m/")
+    print(f"[ \033[92m{counter['success']} \033[97m| \033[33m{counter['failed']} \033[97m| \033[91m{counter['errors']} \033[97m] http://{color}{server}\033[97m/")
 
 
 @add_mutex("save")
@@ -70,13 +70,15 @@ def send_login_request(server, source, city, country, country_code, long, lat):
             except:
                 pass
 
-            print_single(server, True)
+            print_single(server, status=True, color="\033[92m")
             save(server, r.status_code, count, source, city, country, country_code, long, lat)
         else:
             change_value("failed")
+            print_single(server, color="\033[33m")
 
     except Exception:
         change_value("errors")
+        print_single(server, status=True)
 
     finally:
         change_value("threads", -1)
@@ -89,7 +91,7 @@ def start_thread(*args):
     change_value("threads")
     threading.Thread(target=send_login_request, args=(*args,)).start()
 
-print("\033[92msuccess\t\033[33mfailure\t\033[91merror")
+print("\033[92msuccess\t\033[33mfailure\t\033[91merror\033[97m")
 if config.SHODAN:
     api = Shodan(config.SHODAN_API)
     search_term = 'http.html:NVR3.0'
