@@ -1,5 +1,6 @@
 from shodan import Shodan
 from censys.search import CensysHosts
+import netlas
 import config
 import requests
 import threading
@@ -117,3 +118,18 @@ if config.CENSYS:
                 city = location["city"] if 'city' in location else 'N/A'
                 start_thread(f"{server['ip']}:{service['port']}", "CENSYS", city, location["country"], location["country_code"], location["coordinates"]["longitude"], location["coordinates"]["latitude"])
                 
+
+if config.NETLAS:
+    netlas_connection = netlas.Netlas(api_key=config.NETLAS_API)
+   
+    count = netlas_connection.count("http.body:NVR3.0")["count"]
+    for page in range(math.ceil(count/20)):
+
+        query_res = netlas_connection.query(query="http.body:NVR3.0", page=page)
+        for server in query_res["items"]:
+            if not 'geo' in server["data"]:
+                continue
+            city = server["data"]["geo"]["city"] if 'city' in server["data"]["geo"] else 'N/A'
+            start_thread(f"{server['data']['ip']}:{server['data']['port']}", "NETLAS", city, server["data"]["geo"]["country"], server["data"]["geo"]["country"], server["data"]["geo"]["location"]["long"], server["data"]["geo"]["location"]["lat"])
+
+
