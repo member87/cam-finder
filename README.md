@@ -44,3 +44,6 @@ python main.py
 | Username      | Password |
 | -----------   | ----------- |
 | admin         | 123456       |
+
+## Issues
+If you have any problems feel free to create an issue!
