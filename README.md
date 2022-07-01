@@ -3,7 +3,8 @@ find ACTi NVR3.0 cameras with default login details ( admin / 123456 )
 
 ---
 
-[![asciicast](https://asciinema.org/a/6fYwckU43FeBBCiVRzjqYom4G.svg)](https://asciinema.org/a/6fYwckU43FeBBCiVRzjqYom4G)
+[![asciicast](https://asciinema.org/a/9qNTKEAcIqwsXTrNG70FbqOrE.svg)](https://asciinema.org/a/9qNTKEAcIqwsXTrNG70FbqOrE)
+
 
 The program will lookup devices using either [shodan](https://www.shodan.io) or [censys](https://search.censys.io/). It will then try the default login details for the system. Once completed, it saves a ``.csv`` file containing the following information: 
 
