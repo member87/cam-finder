@@ -1,5 +1,5 @@
 # cam-finder
-find ACTi NVR3.0 cameras with default login details ( admin / 123456 )
+Find [ACTi NVR3.0](https://www.acti.com/product/NVR%203%20Enterprise) IP cameras with the default login details ( admin / 123456 )
 
 ---
 
