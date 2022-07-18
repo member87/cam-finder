@@ -1,6 +1,8 @@
 # cam-finder
 Find [ACTi NVR3.0](https://www.acti.com/product/NVR%203%20Enterprise) IP cameras with the default login details ( admin / 123456 )
 
+
+
 ---
 
 [![asciicast](https://asciinema.org/a/9qNTKEAcIqwsXTrNG70FbqOrE.svg)](https://asciinema.org/a/9qNTKEAcIqwsXTrNG70FbqOrE)
@@ -39,6 +41,11 @@ mv config-example.py config.py
 # run program
 python main.py
 ```
+
+## Demo
+View [cam-finder-web](https://github.com/member87/cam-finder-web) for web UI
+
+View [cam-finder.member87.uk](https://cam-finder.member87.uk) for cam-finder-web demo
 
 ## Default credentials
 | Username      | Password |
