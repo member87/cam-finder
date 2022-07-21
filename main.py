@@ -70,16 +70,16 @@ def send_login_request(server, source, city, country, country_code, long, lat):
                     count = len(r.json()["DeviceConfig"]["Devices"]["Device"])
             except:
                 pass
-
-            print_single(server, status=True, color="\033[92m")
+            
             save(server, r.status_code, count, source, city, country, country_code, long, lat)
+            print_single(server, status=True, color="\033[92m")
         else:
             change_value("failed")
             print_single(server, color="\033[33m")
 
     except Exception:
         change_value("errors")
-        print_single(server, status=True)
+        print_single(server)
 
     finally:
         change_value("threads", -1)
