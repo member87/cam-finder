@@ -17,7 +17,7 @@ Some of this information will be provided by the search provider so it may not b
 
 
 ## How to setup search providers:
-You are not required to set each serch provider up however, having more enabled may allow you to find more devices.
+You are not required to set each search provider up however, having more enabled may allow you to find more devices.
 - **censys**: https://censys-python.readthedocs.io/en/stable/quick-start.html
 - **shodan**:
   - create account (https://account.shodan.io/)
