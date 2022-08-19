@@ -98,7 +98,7 @@ if config.SHODAN:
     search_term = 'http.html:NVR3.0'
    
     count = api.count(search_term)['total'] 
-    for page in range(1):#math.ceil(count/100)):
+    for page in range(math.ceil(count/100)):
         query = api.search(query=search_term, page=page+1)
         for server in query['matches']:
             param = f"{server['ip_str']}:{server['port']}"
