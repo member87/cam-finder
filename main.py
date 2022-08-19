@@ -5,7 +5,7 @@ import config
 import requests
 import threading
 import math
-
+from colors import Colors
 
 request_count = 0
 mutex_list = {}
@@ -19,7 +19,7 @@ counter = {
 }
 
 with open('output.csv', 'w') as f:
-    f.writelines("ip,port,status_code,camera count,source,city,country,country_code,longitude,latitude\n")
+    f.writelines("ip,port,camera count,source,city,country,country_code,longitude,latitude\n")
 
 
 def add_mutex(name):
@@ -47,17 +47,15 @@ def change_value(value, change=1):
     return wrapper(value, change)
 
 @add_mutex("print_single")
-def print_single(server, status=False, color="\033[91m"):
-    if status:
-        change_value("success")
-    print(f"[ \033[92m{counter['success']} \033[97m| \033[33m{counter['failed']} \033[97m| \033[91m{counter['errors']} \033[97m] http://{color}{server}\033[97m/")
+def print_single(server, color="\033[91m"):
+    print(f"[ {Colors.green}{counter['success']} {Colors.white}| {Colors.orange}{counter['failed']} {Colors.white}| {Colors.red}{counter['errors']} {Colors.white}] http://{color}{server}{Colors.white}")
 
 
 @add_mutex("save")
-def save(server, code, count, source, city, country, country_code, long, lat):
+def save(server, count, source, city, country, country_code, long, lat):
     split = server.split(":")
     with open('output.csv', 'a') as f:
-        f.writelines(f"{split[0]},{split[1]},{code},{count},{source},{city},{country},{country_code},{long},{lat}\n")
+        f.writelines(f"{split[0]},{split[1]},{count},{source},{city},{country},{country_code},{long},{lat}\n")
 
 def send_login_request(server, source, city, country, country_code, long, lat):
     try:
@@ -71,8 +69,9 @@ def send_login_request(server, source, city, country, country_code, long, lat):
             except:
                 pass
             
-            save(server, r.status_code, count, source, city, country, country_code, long, lat)
-            print_single(server, status=True, color="\033[92m")
+            save(server, count, source, city, country, country_code, long, lat)
+            print_single(server, color="\033[92m")
+            change_value("success")
         else:
             change_value("failed")
             print_single(server, color="\033[33m")
@@ -92,13 +91,14 @@ def start_thread(*args):
     change_value("threads")
     threading.Thread(target=send_login_request, args=(*args,)).start()
 
-print("\033[92msuccess\t\033[33mfailure\t\033[91merror\033[97m")
+print(f"{Colors.green}success\t{Colors.orange}failure\t{Colors.red}error{Colors.white}")
+
 if config.SHODAN:
     api = Shodan(config.SHODAN_API)
     search_term = 'http.html:NVR3.0'
    
     count = api.count(search_term)['total'] 
-    for page in range(math.ceil(count/100)):
+    for page in range(1):#math.ceil(count/100)):
         query = api.search(query=search_term, page=page+1)
         for server in query['matches']:
             param = f"{server['ip_str']}:{server['port']}"
