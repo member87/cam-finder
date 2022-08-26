@@ -6,6 +6,8 @@ import requests
 import threading
 import math
 from colors import Colors
+import os
+
 
 request_count = 0
 mutex_list = {}
@@ -106,6 +108,8 @@ if config.SHODAN:
             start_thread(param, "SHODAN", location["city"], location["country_name"], location["country_code"], location["longitude"], location["latitude"])
 
 if config.CENSYS:
+    os.environ['CENSYS_API_ID'] = config.CENSYS_API
+    os.environ['CENSYS_API_SECRET'] = config.CENSYS_SECRET
     h = CensysHosts()
     query = h.search("NVR3.0", per_page=100, pages=100)
 
