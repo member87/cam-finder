@@ -1,3 +1,4 @@
+from os import replace
 from shodan import Shodan
 from censys.search import CensysHosts
 import netlas
@@ -55,7 +56,7 @@ def print_single(server, color="\033[91m"):
 def save(server, count, source, city, country, country_code, long, lat):
     split = server.split(":")
     with open('output.csv', 'a') as f:
-        f.writelines(f"{split[0]},{split[1]},{count},{source},{city},{country},{country_code},{long},{lat}\n")
+        f.writelines(f"{split[0]},{split[1]},{count},{source},{city.replace(',', ' ')},{country.replace(',', ' ')},{country_code},{long},{lat}\n")
 
 def send_login_request(server, source, city, country, country_code, long, lat):
     try:
