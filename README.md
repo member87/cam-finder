@@ -1,5 +1,7 @@
 # cam-finder
-find ACTi NVR3.0 cameras with default login details ( admin / 123456 )
+Find [ACTi NVR3.0](https://www.acti.com/product/NVR%203%20Enterprise) IP cameras with the default login details ( admin / 123456 )
+
+
 
 ---
 
@@ -15,7 +17,7 @@ Some of this information will be provided by the search provider so it may not b
 
 
 ## How to setup search providers:
-You are not required to set each serch provider up however, having more enabled may allow you to find more devices.
+You are not required to set each search provider up however, having more enabled may allow you to find more devices.
 - **censys**: https://censys-python.readthedocs.io/en/stable/quick-start.html
 - **shodan**:
   - create account (https://account.shodan.io/)
@@ -40,7 +42,15 @@ mv config-example.py config.py
 python main.py
 ```
 
-## Defualt credentials
+## Demo
+View [cam-finder-web](https://github.com/member87/cam-finder-web) for web UI
+
+View [cam-finder.member87.uk](https://cam-finder.member87.uk) for cam-finder-web demo
+
+## Default credentials
 | Username      | Password |
 | -----------   | ----------- |
 | admin         | 123456       |
+
+## Issues
+If you have any problems feel free to create an issue!
