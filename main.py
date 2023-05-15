@@ -1,7 +1,7 @@
 from os import replace
 from shodan import Shodan
 from censys.search import CensysHosts
-import netlas
+# import netlas
 import config
 import requests
 import threading
@@ -124,7 +124,7 @@ if config.CENSYS:
                 start_thread(f"{server['ip']}:{service['port']}", "CENSYS", city, location["country"], location["country_code"], location["coordinates"]["longitude"], location["coordinates"]["latitude"])
                 
 
-if config.NETLAS:
+if config.NETLAS and False:
     netlas_connection = netlas.Netlas(api_key=config.NETLAS_API)
    
     count = netlas_connection.count("http.body:NVR3.0")["count"]
