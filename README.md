@@ -54,3 +54,10 @@ View [cam-finder.member87.uk](https://cam-finder.member87.uk) for cam-finder-web
 
 ## Issues
 If you have any problems feel free to create an issue!
+
+
+                        
+## Stargazers over time
+[![Stargazers over time](https://starchart.cc/member87/cam-finder.svg?variant=adaptive)](https://starchart.cc/member87/cam-finder)
+
+                    
