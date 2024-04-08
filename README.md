@@ -42,11 +42,6 @@ mv config-example.py config.py
 python main.py
 ```
 
-## Demo
-View [cam-finder-web](https://github.com/member87/cam-finder-web) for web UI
-
-View [cam-finder.member87.uk](https://cam-finder.member87.uk) for cam-finder-web demo
-
 ## Default credentials
 | Username      | Password |
 | -----------   | ----------- |
