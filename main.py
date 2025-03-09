@@ -1,7 +1,7 @@
 from os import replace
 from shodan import Shodan
 from censys.search import CensysHosts
-# import netlas
+import netlas
 import config
 import requests
 import threading
