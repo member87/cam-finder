@@ -124,7 +124,7 @@ if config.CENSYS:
                 start_thread(f"{server['ip']}:{service['port']}", "CENSYS", city, location["country"], location["country_code"], location["coordinates"]["longitude"], location["coordinates"]["latitude"])
                 
 
-if config.NETLAS and False:
+if config.NETLAS:
     netlas_connection = netlas.Netlas(api_key=config.NETLAS_API)
    
     count = netlas_connection.count("http.body:NVR3.0")["count"]
